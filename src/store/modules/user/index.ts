@@ -1,12 +1,8 @@
+import type { providerType, UserState } from './types';
+import type { LoginReq } from '@/api/user/types';
 import { defineStore } from 'pinia';
-import type { UserState, providerType } from './types';
-import {
-  getUserProfile,
-  loginByCode,
-  login as userLogin,
-  logout as userLogout,
-} from '@/api/user/index';
-import type { LoginParams } from '@/api/user/types';
+import { UserApi } from '@/api';
+
 import { clearToken, setToken } from '@/utils/auth';
 
 const useUserStore = defineStore('user', {
@@ -32,13 +28,13 @@ const useUserStore = defineStore('user', {
     },
     // 获取用户信息
     async info() {
-      const result = await getUserProfile();
+      const result = await UserApi.profile();
       this.setInfo(result);
     },
     // 异步登录并存储token
-    login(loginForm: LoginParams) {
+    login(loginForm: LoginReq) {
       return new Promise((resolve, reject) => {
-        userLogin(loginForm).then((res) => {
+        UserApi.login(loginForm).then((res) => {
           const token = res.token;
           if (token) {
             setToken(token);
@@ -51,7 +47,7 @@ const useUserStore = defineStore('user', {
     },
     // Logout
     async logout() {
-      await userLogout();
+      await UserApi.logout();
       this.resetInfo();
       clearToken();
     },
@@ -62,7 +58,7 @@ const useUserStore = defineStore('user', {
           provider,
           success: async (result: UniApp.LoginRes) => {
             if (result.code) {
-              const res = await loginByCode({ code: result.code });
+              const res = await UserApi.loginByCode({ code: result.code });
               resolve(res);
             }
             else {
@@ -77,6 +73,7 @@ const useUserStore = defineStore('user', {
       });
     },
   },
+  persist: true,
 });
 
 export default useUserStore;

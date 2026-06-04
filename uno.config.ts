@@ -1,38 +1,18 @@
-import type { Preset, SourceCodeTransformer } from 'unocss';
-import {
-  defineConfig,
-  presetAttributify,
-  presetIcons,
-  transformerDirectives,
-  transformerVariantGroup,
-} from 'unocss';
-import {
-  presetApplet,
-  presetRemRpx,
-  transformerAttributify,
-} from 'unocss-applet';
-
-// eslint-disable-next-line n/prefer-global/process
-const isApplet = process.env?.UNI_PLATFORM?.startsWith('mp-') ?? false;
-const presets: Preset[] = [];
-const transformers: SourceCodeTransformer[] = [];
-
-if (isApplet) {
-  /**
-   * UnoCSS Applet
-   * @see https://github.com/unocss-applet/unocss-applet
-   */
-  presets.push(presetApplet());
-  presets.push(presetRemRpx()); // 如果需要使用 rem 转 rpx 单位，需要启用此插件
-  transformers.push(transformerAttributify({ ignoreAttributes: ['block'] }));
-} else {
-  presets.push(presetApplet())
-  presets.push(presetAttributify())
-  presets.push(presetRemRpx({ mode: 'rpx2rem' }))
-}
+import type { Preset } from 'unocss';
+import { FileSystemIconLoader } from '@iconify/utils/lib/loader/node-loaders';
+import { presetUni } from '@uni-helper/unocss-preset-uni';
+import { presetLegacyCompat } from '@unocss/preset-legacy-compat';
+import { defineConfig, presetIcons, transformerDirectives, transformerVariantGroup } from 'unocss';
 
 export default defineConfig({
   presets: [
+    // https://uni-helper.js.org/unocss-preset-uni
+    presetUni({
+      attributify: {
+        prefixedOnly: true,
+      },
+    }),
+    // https://unocss.dev/presets/icons
     presetIcons({
       scale: 1.2,
       warn: true,
@@ -40,37 +20,60 @@ export default defineConfig({
         'display': 'inline-block',
         'vertical-align': 'middle',
       },
+      // 自定义图标
+      collections: {
+        // 从本地文件系统加载 svg 图标
+        'my-icons': FileSystemIconLoader('./src/static/icons'),
+        // 从在线图标库加载图标
+        // 'my-online-icons': async (iconName) => {
+        //   return await fetch(`https://example.com/icons/${iconName}.svg`).then(res => res.text());
+        // },
+      },
     }),
-    ...presets,
+    /**
+     * 启用 legacy-compat 模式(处理低端安卓机的样式问题)
+     * @see https://unocss.dev/presets/legacy-compat
+     */
+    presetLegacyCompat({
+      commaStyleColorFunction: true,
+      legacyColorSpace: true,
+    }) as Preset,
   ],
   /**
    * 自定义快捷语句
    * @see https://github.com/unocss/unocss#shortcuts
    */
   shortcuts: {
-    'u-bg': 'bg-gray-100 dark:bg-black',
-    'u-bg-2': 'bg-white dark:bg-[#1C1C1E]',
-    'u-border': 'border-[#EBEDF0] dark:border-[#3A3A3C]',
-    'u-active': 'bg-[#F2F3F5] dark:!bg-[#3A3A3C]',
-    'u-active-h5': 'active:bg-[#F2F3F5] active:dark:bg-[#3A3A3C]',
-    'u-text-color': 'text-[#323233] dark:text-[#F5F5F5]',
-    'u-text-color-2': 'text-[#969799] dark:text-[#707070]',
-    'u-text-color-3': 'text-[#C8C9CC] dark:text-[#4D4D4D]',
-    'bg-primary': 'bg-light-blue-500 dark:bg-light-blue-600',
+    'border-base': 'border border-gray-500_10',
+    'center': 'flex justify-center items-center',
+  },
+  rules: [
+    ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
+  ],
+  theme: {
+    colors: {
+      // 主题颜色
+      'primary': 'var(--theme-primary)',
+      'success': 'var(--theme-success)',
+      'warning': 'var(--theme-warning)',
+      'error': 'var(--theme-error)',
+      // 文字颜色
+      'text-main': 'var(--theme-main-color)',
+      'text-content': 'var(--theme-content-color)',
+      'text-tips': 'var(--theme-tips-color)',
+      'text-light': 'var(--theme-light-color)',
+      'text-disabled': 'var(--theme-disabled-color)',
+      // 背景颜色
+      'bg-main': 'var(--theme-bg-color)',
+      'bg-secondary': 'var(--theme-bg-color-secondary)',
+      // 边框颜色
+      'border-main': 'var(--theme-border-color)',
+    },
   },
   transformers: [
-    transformerDirectives(), // 启用 @apply 功能
-    transformerVariantGroup(), // 启用 () 分组功能
-    ...transformers,
-  ],
-  rules: [
-    [
-      'p-safe',
-      {
-        padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
-      },
-    ],
-    ['pt-safe', { 'padding-top': 'env(safe-area-inset-top)' }],
-    ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
+    // 启用指令功能：主要用于支持 @apply、@screen 和 theme() 等 CSS 指令
+    transformerDirectives(),
+    // 启用 () 分组功能
+    transformerVariantGroup(),
   ],
 });

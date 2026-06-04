@@ -14,6 +14,9 @@ declare global {
   declare interface ViteEnv {
     VITE_APP_TITLE?: string;
     VITE_APP_BASE_API: string;
+    VITE_APP_PORT: number;
+    VITE_APP_PROXY: boolean;
+    VITE_API_PREFIX: string;
     VITE_DROP_CONSOLE: boolean;
   }
 
@@ -22,12 +25,16 @@ declare global {
   declare function parseFloat(string: string | number): number;
 
   declare interface Uni {
-    $u: any
+    $u: any;
   }
 
   namespace JSX {
     interface IntrinsicElements {
       view: _View;
     }
+  }
+
+  interface Window {
+    matchMedia: (query: string) => MediaQueryList;
   }
 }

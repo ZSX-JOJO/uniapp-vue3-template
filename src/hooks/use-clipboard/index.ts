@@ -1,14 +1,14 @@
 /**
  * 剪切板
+ * @example
+ * const {setClipboardData, getClipboardData} = useClipboard()
+ * // 设置剪切板
+ * setClipboardData({data: '1234567890'})
+ * // 获取剪切板
+ * const data = await getClipboardData()
  */
-
-interface SetClipboardDataOptions {
-  data: string
-  showToast?: boolean
-}
-
 export default function useClipboard() {
-  const setClipboardData = ({ data, showToast = true }: SetClipboardDataOptions) => {
+  const setClipboardData = ({ data, showToast = true }: UniApp.SetClipboardDataOptions) => {
     return new Promise<string>((resolve, reject) => {
       uni.setClipboardData({
         data,

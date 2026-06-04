@@ -16,12 +16,12 @@
       </view>
 
       <view class="mt-30rpx flex items-center justify-around pt-10rpx">
-        <view style="min-width: 100px">
+        <view class="min-w-100px">
           <button class="button button-default" @click="disagree">
             拒绝
           </button>
         </view>
-        <view style="min-width: 100px">
+        <view class="min-w-100px">
           <button
             :id="agreePrivacyId"
             class="button button-primary"
@@ -38,15 +38,15 @@
 
 <script setup lang="ts">
 interface AgreePrivacyProps {
-  modelValue: boolean
+  modelValue: boolean;
   // 标题
-  title: string
+  title: string;
   // 副标题
-  subTitle: string
+  subTitle: string;
   // 禁止自动检测隐私
-  disableCheckPrivacy: boolean
+  disableCheckPrivacy: boolean;
   // 按钮id 必填项不填写时授权按钮id必须为agree-btn
-  agreePrivacyId: string
+  agreePrivacyId: string;
 }
 
 const props = withDefaults(defineProps<AgreePrivacyProps>(), {
@@ -80,7 +80,7 @@ function initData() {
   initTitle.value = props.title || initTitle.value;
   initSubTitle.value
     = props.subTitle
-    || `亲爱的用户，感谢您一直以来的支持!为了更好地保护您的权益，同时遵守相关监管要求，请认真阅读${initPrivacyContractName.value}，特向您说明如下:`;
+      || `亲爱的用户，感谢您一直以来的支持!为了更好地保护您的权益，同时遵守相关监管要求，请认真阅读${initPrivacyContractName.value}，特向您说明如下:`;
 }
 
 // 检测是否授权
@@ -146,40 +146,40 @@ onMounted(() => {
 <style scoped lang="scss">
 .button {
   position: relative;
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   //height: 80rpx;
   padding: 10px 20px;
   font-size: 14px;
-  text-align: center;
-  text-decoration: none;
-  color: #fff;
-  border-radius: 18rpx;
-  box-sizing: border-box;
-  flex-direction: row;
   font-weight: 500;
   line-height: 1.5;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 18rpx;
   //border-width: 1px;
   //border-style: solid;
 }
 
 .button-lg {
   position: relative;
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   //height: 80rpx;
   padding: 12px 22px;
   font-size: 14px;
-  text-align: center;
-  text-decoration: none;
-  color: #fff;
-  border-radius: 20rpx;
-  box-sizing: border-box;
-  flex-direction: row;
   font-weight: 700;
   line-height: 1.5;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 20rpx;
   //border-width: 1px;
   //border-style: solid;
 }
@@ -197,10 +197,10 @@ onMounted(() => {
 button {
   padding: 0;
   margin: 0;
+  line-height: inherit;
+  outline: none;
   background-color: transparent;
   border-radius: 0;
-  outline: none;
-  line-height: inherit;
 }
 
 button::after {
@@ -208,7 +208,7 @@ button::after {
 }
 
 .text-decoration {
-  text-decoration: underline;
   color: #07c160;
+  text-decoration: underline;
 }
 </style>

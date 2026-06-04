@@ -1,116 +1,96 @@
 export default {
-  "extends": ["stylelint-config-standard", "stylelint-config-standard-vue"],
-  "plugins": ["stylelint-order"],
-  "overrides": [
+  // 继承规则
+  extends: [
+    'stylelint-config-standard-scss',
+    'stylelint-config-recess-order',
+  ],
+  // Vue SFC <style> 解析
+  overrides: [
     {
-      "files": ["**/*.(scss|css|vue|html)"],
-      "customSyntax": "postcss-scss"
+      files: ['**/*.vue'],
+      customSyntax: 'postcss-html',
     },
-    {
-      "files": ["**/*.(html|vue)"],
-      "customSyntax": "postcss-html"
-    }
   ],
-  "ignoreFiles": [
-    "**/*.js",
-    "**/*.jsx",
-    "**/*.tsx",
-    "**/*.ts",
-    "**/*.json",
-    "**/*.md",
-    "**/*.yaml",
-    "dist/*",
-    "uni_modules/*"
+  // 忽略文件
+  ignoreFiles: [
+    'dist/**',
+    'src/uni_modules/**',
+    'node_modules/**',
   ],
-  "rules": {
-    "import-notation": "string",
-    "unit-no-unknown": [true, { "ignoreUnits": ["rpx"] }],
-    "no-descending-specificity": null,
-    "selector-pseudo-element-no-unknown": [
-      true,
-      {
-        "ignorePseudoElements": ["v-deep"]
-      }
-    ],
-    "selector-pseudo-class-no-unknown": [
-      true,
-      {
-        "ignorePseudoClasses": ["deep"]
-      }
-    ],
-    "selector-type-no-unknown": [true, { "ignoreTypes": ["page", "radio", "checkbox", "scroll-view"] }],
-    "order/properties-order": [
-      "position",
-      "top",
-      "right",
-      "bottom",
-      "left",
-      "z-index",
-      "display",
-      "justify-content",
-      "align-items",
-      "float",
-      "clear",
-      "overflow",
-      "overflow-x",
-      "overflow-y",
-      "padding",
-      "padding-top",
-      "padding-right",
-      "padding-bottom",
-      "padding-left",
-      "margin",
-      "margin-top",
-      "margin-right",
-      "margin-bottom",
-      "margin-left",
-      "width",
-      "min-width",
-      "max-width",
-      "height",
-      "min-height",
-      "max-height",
-      "font-size",
-      "font-family",
-      "text-align",
-      "text-justify",
-      "text-indent",
-      "text-overflow",
-      "text-decoration",
-      "white-space",
-      "color",
-      "background",
-      "background-position",
-      "background-repeat",
-      "background-size",
-      "background-color",
-      "background-clip",
-      "border",
-      "border-style",
-      "border-width",
-      "border-color",
-      "border-top-style",
-      "border-top-width",
-      "border-top-color",
-      "border-right-style",
-      "border-right-width",
-      "border-right-color",
-      "border-bottom-style",
-      "border-bottom-width",
-      "border-bottom-color",
-      "border-left-style",
-      "border-left-width",
-      "border-left-color",
-      "border-radius",
-      "opacity",
-      "filter",
-      "list-style",
-      "outline",
-      "visibility",
-      "box-shadow",
-      "text-shadow",
-      "resize",
-      "transition"
-    ]
-  }
-}
+  rules: {
+    // --- 基础规则优化 ---
+    'no-empty-source': null,
+    'no-descending-specificity': null,
+    'comment-no-empty': true,
+    'comment-empty-line-before': null,
+    'color-hex-length': null,
+    'import-notation': 'string',
+
+    // --- UniApp & 小程序适配 ---
+    // 允许 rpx 单位
+    'unit-no-unknown': [true, {
+      ignoreUnits: ['rpx'],
+    }],
+    // 允许小程序特有标签
+    'selector-type-no-unknown': [true, {
+      ignoreTypes: [
+        'page',
+        'view',
+        'text',
+        'image',
+        'scroll-view',
+        'swiper',
+        'swiper-item',
+        'navigator',
+        'button',
+        'radio',
+        'checkbox',
+        'label',
+        'form',
+        'picker',
+        'picker-view',
+      ],
+    }],
+
+    // --- UnoCSS 兼容 (关键) ---
+    'scss/at-rule-no-unknown': [true, {
+      ignoreAtRules: [
+        'apply',
+        'variants',
+        'responsive',
+        'screen',
+        'unocss',
+        'theme',
+      ],
+    }],
+    'function-no-unknown': [true, {
+      ignoreFunctions: ['theme', 'v-bind'],
+    }],
+
+    // --- Vue3 深度选择器适配 ---
+    'selector-pseudo-element-no-unknown': [true, {
+      ignorePseudoElements: ['v-deep', 'v-global', 'v-slotted'],
+    }],
+    'selector-pseudo-class-no-unknown': [true, {
+      ignorePseudoClasses: ['deep', 'global'],
+    }],
+
+    // --- 声明值校验优化 (针对 v-bind 和 rpx) ---
+    'declaration-property-value-no-unknown': [true, {
+      ignoreProperties: {
+        '/.+/': [
+          /v-bind\(.+\)/,
+          /(\d+(\.\d+)?rpx)/,
+        ],
+      },
+    }],
+
+    // --- SCSS 规则微调 (配合 @antfu 风格) ---
+    'scss/load-partial-extension': null,
+    'scss/double-slash-comment-empty-line-before': null,
+    'scss/double-slash-comment-whitespace-inside': null,
+
+    // 禁用标准 CSS 中不支持 SCSS 函数的报错
+    'at-rule-no-deprecated': null,
+  },
+};

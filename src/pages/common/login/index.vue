@@ -50,14 +50,18 @@
 </template>
 
 <script setup lang="ts">
-import uCode from 'uview-plus/components/u-code/u-code.vue';
 import type { CSSProperties } from 'vue';
+import uCode from 'uview-plus/components/u-code/u-code.vue';
+import { HOME_PATH, isTabBarPath, LOGIN_PATH, removeQueryString } from '@/router';
 import { setToken } from '@/utils/auth';
+// import { useUserStore } from '@/store';
 
+// const userStore = useUserStore();
 const tel = ref<string>('18502811111');
 const code = ref<string>('1234');
 const tips = ref<string>();
 const uCodeRef = ref<InstanceType<typeof uCode> | null>(null);
+let redirect = HOME_PATH;
 
 const inputStyle = computed<CSSProperties>(() => {
   const style = {} as CSSProperties;
@@ -89,13 +93,34 @@ function getCode() {
     uni.$u.toast('倒计时结束后再发送');
   }
 }
-
-function submit() {
-  if (uni.$u.test.mobile(tel.value)) {
-    setToken('1234567890');
-    uni.reLaunch({ url: '/pages/tab/home/index' });
+async function submit() {
+  if (!uni.$u.test.mobile(Number(tel.value))) {
+    uni.$u.toast('请输入正确的手机号');
+    return;
   }
+  if (!code.value) {
+    uni.$u.toast('请输入验证码');
+    return;
+  }
+  // 登录请求
+  // const res = await userStore.login({ phone: tel.value, code: code.value }).catch(() => {
+  //   uni.$u.toast('登录失败');
+  // });
+  // if (!res) return;
+  setToken('1234567890');
+  setTimeout(() => {
+    uni.$u.route({
+      type: isTabBarPath(redirect) ? 'switchTab' : 'redirectTo',
+      url: redirect,
+    });
+  }, 800);
 }
+
+onLoad((options: any) => {
+  if (options.redirect && removeQueryString(options.redirect) !== LOGIN_PATH) {
+    redirect = decodeURIComponent(options.redirect);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -103,7 +128,7 @@ function submit() {
   @apply mt-80rpx mx-auto mb-0 w-600rpx;
 
   .title {
-    @apply mb-100rpx font-size-60rpx text-left font-500;
+    @apply mb-100rpx text-60rpx text-left font-500;
   }
 
   input {
@@ -117,7 +142,7 @@ function submit() {
   }
 
   .login-btn {
-    @apply flex items-center justify-center py-12rpx px-0 font-size-30rpx bg-#fdf3d0 border-none;
+    @apply flex items-center justify-center py-12rpx px-0 text-30rpx bg-#fdf3d0 border-none;
 
     color: $u-tips-color;
 
@@ -137,14 +162,14 @@ function submit() {
   @apply flex justify-between pt-350rpx px-150rpx pb-150rpx;
 
   .item {
-    @apply flex items-center flex-col font-size-28rpx;
+    @apply flex items-center flex-col text-28rpx;
 
     color: $u-content-color;
   }
 }
 
 .hint {
-  @apply px-40rpx py-20rpx font-size-20rpx;
+  @apply px-40rpx py-20rpx text-24rpx;
 
   color: $u-tips-color;
 

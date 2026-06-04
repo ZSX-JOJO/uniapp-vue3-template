@@ -1,13 +1,21 @@
-import { defineStore } from 'pinia';
 import type { AppState } from './types';
+import { defineStore } from 'pinia';
+import storage from '@/utils/storage';
+
+// 缓存的主题
+const THEME_KEY = 'app-theme';
 
 const useAppStore = defineStore('app', {
   state: (): AppState => ({
     systemInfo: {} as UniApp.GetSystemInfoResult,
+    theme: storage.get(THEME_KEY) || 'light',
   }),
   getters: {
     getSystemInfo(): UniApp.GetSystemInfoResult {
       return this.systemInfo;
+    },
+    getTheme(): string {
+      return this.theme;
     },
   },
   actions: {
@@ -24,33 +32,14 @@ const useAppStore = defineStore('app', {
         },
       });
     },
-    checkUpdate() {
-      const updateManager = uni.getUpdateManager();
-      updateManager.onCheckForUpdate((res: UniApp.OnCheckForUpdateResult) => {
-        // 请求完新版本信息的回调
+    /**
+     * 设置主题
+     */
+    setTheme(theme: string) {
+      this.theme = theme;
 
-        console.log(res.hasUpdate);
-      });
-      updateManager.onUpdateReady(() => {
-        uni.showModal({
-          title: '更新提示',
-          content: '新版本已经准备好，是否重启应用?',
-          success(res) {
-            if (res.confirm) {
-              // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
-              updateManager.applyUpdate();
-            }
-          },
-        });
-      });
-      updateManager.onUpdateFailed((res: any) => {
-        console.error(res);
-        // 新的版本下载失败
-        uni.showToast({
-          title: '更新失败',
-          icon: 'error',
-        });
-      });
+      // 保存到本地存储
+      storage.set(THEME_KEY, this.theme);
     },
   },
 });
